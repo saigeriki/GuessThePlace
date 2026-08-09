@@ -1,115 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- PRO UI - Modern Guess The Place - Legacy XML fallback (Compose is primary) -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="@drawable/bg_pro_gradient">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <!-- Score + Timer Row -->
+        <!-- Top Brand Pro -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp"
-            android:weightSum="2">
+            android:gravity="center_vertical"
+            android:background="@drawable/card_rounded_28"
+            android:padding="14dp"
+            android:elevation="8dp">
+
+            <TextView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/btn_primary_gradient"
+                android:gravity="center"
+                android:text="🏆"
+                android:textSize="22sp"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GUESS THE"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.12"
+                    android:textColor="#FF787680"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PLACE • INDIA"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#FF1B1B1F"/>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvScore"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/chip_gold"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp"
+                android:text="⭐ 0 / 17"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#FF5D4200"/>
+
+        </LinearLayout>
+
+        <!-- Progress section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/btn_primary_gradient"
+                android:gravity="center"
+                android:text="📍"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="QUESTION"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.12"
+                android:layout_marginStart="8dp"
+                android:textColor="#FF787680"/>
+
+            <TextView
+                android:id="@+id/tvQuestion"
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                android:text="Score : 0 / 0"
-                android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:layout_height="wrap_content"
+                android:text="1 / 17"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginStart="6dp"/>
 
             <TextView
                 android:id="@+id/tvTimer"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAlignment="viewEnd"
-                android:text="Time : 10"
-                android:textSize="18sp"/>
+                android:background="@drawable/card_rounded_28"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:text="⏱ 10s"
+                android:textStyle="bold"
+                android:textColor="#FF1B1B1F"/>
         </LinearLayout>
 
-        <!-- Question Number -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_marginTop="10dp"
+            android:progress="30"
+            android:max="100"/>
+
+        <!-- Image Card -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/card_rounded_28"
+            android:elevation="20dp">
+
+            <ImageView
+                android:id="@+id/imageViewPlace"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="14dp"
+                android:background="#73400000"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:text="📍 INDIA • HERITAGE"
+                android:textColor="#FFFFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold"/>
+        </FrameLayout>
+
         <TextView
-            android:id="@+id/tvQuestion"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Question : 1 / 17"
-            android:textSize="16sp"
+            android:text="✨ Guess this iconic place"
             android:textStyle="bold"
-            android:layout_marginBottom="12dp"/>
+            android:textSize="16sp"
+            android:layout_marginTop="20dp"
+            android:textColor="#FF1B1B1F"/>
 
-        <!-- Place Image -->
-        <ImageView
-            android:id="@+id/imageViewPlace"
-            android:layout_width="match_parent"
-            android:layout_height="240dp"
-            android:scaleType="centerCrop"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Options -->
+        <!-- Options - Pro cards -->
         <Button
             android:id="@+id/btnOption1"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginBottom="10dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/option_default"
             android:textAllCaps="false"
-            android:textSize="16sp"/>
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#FF1B1B1F"/>
 
         <Button
             android:id="@+id/btnOption2"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginBottom="10dp"
+            android:layout_height="64dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/option_default"
             android:textAllCaps="false"
-            android:textSize="16sp"/>
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#FF1B1B1F"/>
 
         <Button
             android:id="@+id/btnOption3"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginBottom="10dp"
+            android:layout_height="64dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/option_default"
             android:textAllCaps="false"
-            android:textSize="16sp"/>
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#FF1B1B1F"/>
 
         <Button
             android:id="@+id/btnOption4"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginBottom="14dp"
+            android:layout_height="64dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/option_default"
             android:textAllCaps="false"
-            android:textSize="16sp"/>
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#FF1B1B1F"/>
 
-        <!-- Next Button -->
-        <Button
-            android:id="@+id/btnNext"
+        <!-- Actions -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:text="Next"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:layout_marginBottom="10dp"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="24dp">
 
-        <!-- Restart Button -->
-        <Button
-            android:id="@+id/btnRestart"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:text="Restart Game"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:layout_marginBottom="24dp"/>
+            <Button
+                android:id="@+id/btnRestart"
+                android:layout_width="0dp"
+                android:layout_weight="0.35"
+                android:layout_height="56dp"
+                android:layout_marginEnd="12dp"
+                android:text="Reset"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:backgroundTint="#FFEAE7F4"/>
+
+            <Button
+                android:id="@+id/btnNext"
+                android:layout_width="0dp"
+                android:layout_weight="0.65"
+                android:layout_height="56dp"
+                android:background="@drawable/btn_primary_gradient"
+                android:text="Next Challenge →"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="#FFFFFFFF"/>
+        </LinearLayout>
 
     </LinearLayout>
-
 </ScrollView>
