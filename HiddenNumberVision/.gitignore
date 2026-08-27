@@ -1,0 +1,13 @@
+.dart_tool/
+build/
+.pub-cache/
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+android/
+ios/
+web/
+linux/
+windows/
+macos/
+prototype/contact_sheet.png

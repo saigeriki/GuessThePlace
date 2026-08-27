@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Netra — hidden number plate (playable spec for the Flutter app)</title>
+    <style>
+      :root {
+        --bg: #07080d;
+        --panel: #12151f;
+        --ink: #e8ecf4;
+        --dim: #8a93a6;
+        --good: #6fe3a8;
+        --bad: #ff8a8a;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: radial-gradient(120% 80% at 50% 0%, #171c2a 0%, var(--bg) 55%);
+        color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        display: flex; justify-content: center; padding: 22px 14px 60px;
+      }
+      .wrap { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); width: 100%; max-width: 980px; }
+      @media (min-width: 800px) { .wrap { grid-template-columns: 380px minmax(0, 1fr); align-items: start; } }
+      h1 { font-size: 19px; margin: 0 0 2px; letter-spacing: .3px; }
+      .sub { color: var(--dim); font-size: 12.5px; margin: 0 0 14px; }
+      .phone {
+        background: var(--panel); border: 1px solid #222839; border-radius: 22px; padding: 12px;
+        box-shadow: 0 30px 70px -30px #000; max-width: 380px; margin: 0 auto;
+      }
+      .hud { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--dim); }
+      .hud b { color: var(--ink); font-size: 14px; }
+      .hud .sp { flex: 1; }
+      .bar { height: 5px; border-radius: 4px; background: #ffffff18; overflow: hidden; margin: 8px 0 10px; }
+      .bar > i { display: block; height: 100%; width: 100%; background: var(--good); transition: width .1s linear; }
+      canvas { width: 100%; aspect-ratio: 1 / 1; display: block; border-radius: 16px; background: #07080d; touch-action: manipulation; }
+      .answer { display: flex; gap: 6px; justify-content: center; margin: 10px 0 8px; }
+      .answer span {
+        width: 38px; height: 44px; border: 1px solid #ffffff2b; border-radius: 10px; display: grid; place-items: center;
+        font-size: 22px; font-weight: 800; background: #ffffff0a;
+      }
+      .keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+      .keys button, .row button {
+        height: 46px; border: 0; border-radius: 11px; background: #ffffff0d; color: var(--ink);
+        font-size: 19px; font-weight: 700; cursor: pointer;
+      }
+      .keys button.act { background: #ffffff1a; }
+      .keys button:active, .row button:active { transform: translateY(1px); background: #ffffff26; }
+      .row { display: flex; gap: 8px; margin-top: 10px; }
+      .row button { flex: 1; font-size: 13px; font-weight: 600; color: var(--dim); padding: 0 8px; }
+      .msg { text-align: center; font-weight: 800; font-size: 13.5px; height: 18px; margin-top: 8px; letter-spacing: .3px; }
+      .card { background: #0d101a; border: 1px solid #1e2432; border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; }
+      .card h2 { font-size: 11px; letter-spacing: 2px; color: var(--dim); margin: 0 0 10px; text-transform: uppercase; }
+      label.ctl { display: block; font-size: 12.5px; color: var(--dim); margin: 12px 0 4px; }
+      input[type="range"] { width: 100%; }
+      .seg { display: flex; gap: 6px; }
+      .seg button {
+        flex: 1; height: 34px; border-radius: 9px; border: 1px solid #ffffff1f; background: transparent;
+        color: var(--dim); font-weight: 700; font-size: 12.5px; cursor: pointer;
+      }
+      .seg button[aria-pressed="true"] { background: var(--good); color: #05251a; border-color: transparent; }
+      table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+      th, td { text-align: left; padding: 4px 0; border-bottom: 1px dashed #1c2230; color: var(--dim); }
+      td:last-child, th:last-child { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+      .note { font-size: 12.5px; color: var(--dim); }
+      .kbd { font: 11px ui-monospace, monospace; background: #ffffff14; padding: 1px 5px; border-radius: 5px; color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="phone">
+        <div class="hud">
+          <b id="qno">1/10</b><span id="mode">DOTS</span><span class="sp"></span>
+          <span id="lives">● ● ●</span><b id="score">0</b>
+        </div>
+        <div class="bar"><i id="barfill"></i></div>
+        <canvas id="plate" width="760" height="760"></canvas>
+        <div class="answer" id="answer"></div>
+        <div class="keys" id="keys"></div>
+        <div class="row">
+          <button id="hint">Fade noise (<span id="hints">3</span>)</button>
+          <button id="reveal">Reveal</button>
+          <button id="again">New</button>
+        </div>
+        <div class="msg" id="msg"></div>
+      </section>
+
+      <section>
+        <h1>Netra — hidden number plate</h1>
+        <p class="sub">
+          Playable spec for the Flutter app in <span class="kbd">../lib</span>. Same generator
+          (<span class="kbd">prototype/vision_core.js</span> ⇄ <span class="kbd">lib/game/puzzle.dart</span>),
+          so tune the feel here and the numbers carry over.
+        </p>
+
+        <div class="card">
+          <h2>Controls</h2>
+          <div class="seg" id="styleSeg">
+            <button data-style="dots" aria-pressed="true">Dots</button>
+            <button data-style="lines" aria-pressed="false">Lines</button>
+            <button data-style="mixed" aria-pressed="false">Mixed</button>
+          </div>
+          <label class="ctl">Level <span id="lvlOut">1</span> — digit count, colour gap, decoys and timer all follow this</label>
+          <input type="range" id="level" min="1" max="14" value="1" step="1" />
+          <p class="note">
+            Keys: <span class="kbd">0-9</span> type · <span class="kbd">Enter</span> submit ·
+            <span class="kbd">Backspace</span> fix · <span class="kbd">H</span> hint · <span class="kbd">N</span> new plate
+          </p>
+        </div>
+
+        <div class="card">
+          <h2>This plate</h2>
+          <table id="diag"></table>
+          <p class="note" id="curve"></p>
+        </div>
+
+        <div class="card">
+          <h2>Difficulty curve (what the app does)</h2>
+          <table>
+            <tr><th>level</th><th>digits</th><th>hue gap</th><th>time</th></tr>
+            <tr><td>1 – 3</td><td>1</td><td>80° → 61°</td><td>14.5 s</td></tr>
+            <tr><td>4 – 6</td><td>2</td><td>61° → 41°</td><td>13.3 → 12.1 s</td></tr>
+            <tr><td>7 – 9</td><td>3</td><td>41° → 22°</td><td>12.1 → 10.9 s</td></tr>
+            <tr><td>10 +</td><td>3</td><td>22°, near-isochromatic</td><td>8.5 s floor</td></tr>
+          </table>
+          <p class="note">
+            The number is never hidden by <em>brightness</em> alone: the generator forces a
+            luminance gap (50 → 26 / 255) so it stays findable by eye, and shrinks the
+            <em>hue</em> gap to add the pressure.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <script src="vision_core.js"></script>
+    <script>
+      const cvs = document.getElementById('plate');
+      const ctx = cvs.getContext('2d');
+      const el = (id) => document.getElementById(id);
+
+      const state = {
+        level: 1,
+        question: 0,
+        style: 'dots',
+        score: 0,
+        streak: 0,
+        lives: 3,
+        hints: 3,
+        typed: '',
+        hintOn: false,
+        reveal: false,
+        locked: false,
+        remainMs: 0,
+        puzzle: null,
+      };
+      let timer = null;
+
+      const rgb = (c, wobble = 0, dim = 1) => {
+        const [r, g, b] = hsvToRgb(c.hue + wobble, c.sat, c.val * dim);
+        return `rgb(${r},${g},${b})`;
+      };
+
+      function styleFor() {
+        return state.style === 'mixed' ? (state.question % 2 === 0 ? 'dots' : 'lines') : state.style;
+      }
+
+      function draw() {
+        const p = state.puzzle;
+        const mode = styleFor();
+        const S = cvs.width;
+        const side = S * 0.99;
+        const off = (S - side) / 2;
+        ctx.clearRect(0, 0, S, S);
+        ctx.fillStyle = '#07080d';
+        ctx.fillRect(0, 0, S, S);
+        ctx.fillStyle = '#141926';
+        ctx.beginPath();
+        ctx.arc(S / 2, S / 2, 0.44 * side * 1.03, 0, Math.PI * 2);
+        ctx.fill();
+
+        const shift = (c, target) => {
+          if (state.reveal) return target ? { hue: c.hue, sat: 0, val: 1 } : { hue: c.hue, sat: Math.max(0, c.sat - 0.6), val: c.val * 0.45 };
+          if (state.hintOn) return target ? { hue: c.hue, sat: Math.min(1, c.sat + 0.1), val: Math.min(1, c.val + 0.06) } : { hue: c.hue, sat: Math.max(0, c.sat - 0.5), val: c.val * 0.65 };
+          return c;
+        };
+
+        if (mode === 'dots') {
+          for (const d of p.dots) {
+            const c = shift(p.fg, d.target);
+            ctx.fillStyle = rgb(c, d.target ? d.tint * 1.4 : d.tint * 1.4);
+            ctx.beginPath();
+            ctx.arc(off + d.x * side, off + d.y * side, Math.max(0.5, d.r * side), 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else {
+          const paint = (s) => {
+            const c = shift(p.fg, s.target);
+            ctx.strokeStyle = rgb(c, 0);
+            ctx.lineWidth = Math.max(0.7, s.w * p.cell * side * 0.82);
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(off + s.x1 * side, off + s.y1 * side);
+            ctx.lineTo(off + s.x2 * side, off + s.y2 * side);
+            ctx.stroke();
+          };
+          // thin decoy corridors first, the digit skeleton last (same order as MazePainter)
+          p.segments.forEach((s) => !s.target && paint(s));
+          p.segments.forEach((s) => s.target && paint(s));
+        }
+        el('mode').textContent = mode.toUpperCase();
+      }
+
+      function diagnostics() {
+        const p = state.puzzle;
+        const fg = hsvToRgb(p.fg.hue, p.fg.sat, p.fg.val);
+        const bg = hsvToRgb(p.bg.hue, p.bg.sat, p.bg.val);
+        const lum = (c) => 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2];
+        let hueGap = Math.abs(p.fg.hue - p.bg.hue) % 360;
+        if (hueGap > 180) hueGap = 360 - hueGap;
+        const rows = [
+          ['answer (hidden)', p.answer],
+          ['digits / level', `${p.digitCount} / L${p.level}`],
+          ['dots (number + noise)', `${p.dots.filter((d) => d.target).length} + ${p.dots.filter((d) => !d.target).length}`],
+          ['segments (number + decoy)', `${p.segments.filter((s) => s.target).length} + ${p.segments.filter((s) => !s.target).length}`],
+          ['hue gap', `${hueGap.toFixed(0)}°`],
+          ['luminance gap', `${Math.abs(lum(fg) - lum(bg)).toFixed(0)} / 255`],
+          ['time limit', `${(p.timeLimitMs / 1000).toFixed(1)} s`],
+        ];
+        el('diag').innerHTML = rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+        el('curve').textContent =
+          `generation cost: one plate = ${p.dots.length} circles + ${p.segments.length} strokes, drawn in a single CustomPainter pass (no image assets, no widgets per dot).`;
+      }
+
+      function renderAnswer() {
+        const len = state.puzzle.answer.length;
+        const box = state.reveal ? state.puzzle.answer : state.typed;
+        el('answer').innerHTML = Array.from({ length: len }, (_, i) => `<span>${box[i] || ''}</span>`).join('');
+      }
+
+      function renderHud() {
+        el('qno').textContent = `${state.question + 1}/10`;
+        el('score').textContent = state.score;
+        el('hints').textContent = state.hints;
+        el('lives').textContent = '● '.repeat(Math.max(0, state.lives)).trim() || '☠';
+      }
+
+      function newPlate(resetQuestion) {
+        if (resetQuestion) {
+          state.question = 0;
+          state.score = 0;
+          state.streak = 0;
+          state.lives = 3;
+          state.hints = 3;
+        }
+        state.level = +el('level').value;
+        state.puzzle = createPuzzle(state.level + state.question, state.question);
+        state.typed = '';
+        state.reveal = false;
+        state.hintOn = false;
+        state.locked = false;
+        state.remainMs = state.puzzle.timeLimitMs;
+        el('msg').textContent = '';
+        el('barfill').style.background = 'var(--good)';
+        draw();
+        renderAnswer();
+        renderHud();
+        diagnostics();
+        restartTimer();
+      }
+
+      function restartTimer() {
+        clearInterval(timer);
+        timer = setInterval(() => {
+          if (state.locked) return;
+          state.remainMs -= 100;
+          const frac = Math.max(0, state.remainMs / state.puzzle.timeLimitMs);
+          el('barfill').style.width = (frac * 100).toFixed(1) + '%';
+          el('barfill').style.background = frac > 0.5 ? 'var(--good)' : frac > 0.25 ? '#ffc66b' : 'var(--bad)';
+          if (state.remainMs <= 0) submit(true);
+        }, 100);
+      }
+
+      function submit(timeout) {
+        if (state.locked) return;
+        state.locked = true;
+        const ok = !timeout && state.typed === state.puzzle.answer;
+        if (ok) {
+          const gained = scoreFor(state.puzzle, state.remainMs, state.streak, false);
+          state.score += gained;
+          state.streak++;
+          el('msg').style.color = 'var(--good)';
+          el('msg').textContent = `Correct  +${gained}`;
+          setTimeout(() => (state.question < 9 ? newPlate(false) : newPlate(true)), 700);
+        } else {
+          state.lives--;
+          state.streak = 0;
+          state.reveal = true;
+          el('msg').style.color = 'var(--bad)';
+          el('msg').textContent = timeout ? `Time up — it was ${state.puzzle.answer}` : `It was ${state.puzzle.answer}`;
+          draw();
+          renderAnswer();
+          setTimeout(() => (state.lives > 0 && state.question < 9 ? newPlate(false) : newPlate(true)), 1500);
+        }
+        renderHud();
+      }
+
+      function type(ch) {
+        if (state.locked) return;
+        if (ch === 'del') state.typed = state.typed.slice(0, -1);
+        else if (state.typed.length < state.puzzle.answer.length) state.typed += ch;
+        renderAnswer();
+        if (state.typed.length === state.puzzle.answer.length) setTimeout(() => submit(false), 120);
+      }
+
+      // keypad
+      el('keys').innerHTML = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'ok']
+        .map((k) => `<button data-k="${k}" class="${k === 'del' || k === 'ok' ? 'act' : ''}">${k === 'del' ? '⌫' : k === 'ok' ? '✓' : k}</button>`)
+        .join('');
+      el('keys').addEventListener('click', (e) => {
+        const k = e.target.dataset.k;
+        if (!k) return;
+        if (k === 'ok') submit(false);
+        else type(k);
+      });
+
+      el('level').addEventListener('input', () => {
+        el('lvlOut').textContent = el('level').value;
+        newPlate(false);
+      });
+      el('styleSeg').addEventListener('click', (e) => {
+        const b = e.target.closest('button');
+        if (!b) return;
+        state.style = b.dataset.style;
+        [...el('styleSeg').children].forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        draw();
+      });
+      el('hint').addEventListener('click', () => {
+        if (state.locked || state.hints <= 0) return;
+        state.hints--;
+        state.hintOn = true;
+        draw();
+        renderHud();
+        setTimeout(() => {
+          state.hintOn = false;
+          draw();
+        }, 2600);
+      });
+      el('reveal').addEventListener('click', () => {
+        if (state.locked) return;
+        state.locked = true;
+        state.reveal = true;
+        state.streak = 0;
+        el('msg').style.color = 'var(--bad)';
+        el('msg').textContent = `It was ${state.puzzle.answer}`;
+        draw();
+        renderAnswer();
+        setTimeout(() => (state.question < 9 ? newPlate(false) : newPlate(true)), 1500);
+      });
+      el('again').addEventListener('click', () => newPlate(true));
+      addEventListener('keydown', (e) => {
+        if (e.key >= '0' && e.key <= '9') type(e.key);
+        else if (e.key === 'Backspace') { e.preventDefault(); type('del'); }
+        else if (e.key === 'Enter') submit(false);
+        else if (e.key.toLowerCase() === 'h') el('hint').click();
+        else if (e.key.toLowerCase() === 'n') newPlate(state.question >= 9);
+      });
+
+      newPlate(true);
+    </script>
+  </body>
+</html>

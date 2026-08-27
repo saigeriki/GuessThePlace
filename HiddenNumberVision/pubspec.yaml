@@ -1,0 +1,22 @@
+name: hidden_number_vision
+description: Netra — a hidden-number vision test game. Find the number inside an ishihara-style dot plate or a line maze.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # only used to remember the best score; every call is wrapped in try/catch, so
+  # deleting this package and Prefs' bodies still leaves a playable game
+  shared_preferences: ^2.2.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
