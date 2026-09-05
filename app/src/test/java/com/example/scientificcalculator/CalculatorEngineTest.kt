@@ -88,6 +88,12 @@ class CalculatorEngineTest {
     }
 
     @Test
+    fun `power function and log base 2`() {
+        assertEquals(1024.0, CalculatorEngine.evaluate("pow(2,10)"), delta)
+        assertEquals(3.0, CalculatorEngine.evaluate("log2(8)"), delta)
+    }
+
+    @Test
     fun `divide by zero throws`() {
         assertThrows { CalculatorEngine.evaluate("5/0") }
     }

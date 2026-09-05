@@ -128,6 +128,13 @@ private val scientificRows = listOf(
         CalcKey("tanh", CalcAction.Insert("tanh("), KeyStyle.FUNCTION),
         CalcKey("∛", CalcAction.Insert("cbrt("), KeyStyle.FUNCTION),
         CalcKey("ⁿ√", CalcAction.Insert("nrt("), KeyStyle.FUNCTION)
+    ),
+    listOf(
+        CalcKey(",", CalcAction.Insert(","), KeyStyle.FUNCTION),
+        CalcKey("eˣ", CalcAction.Insert("e^"), KeyStyle.OPERATOR),
+        CalcKey("log₂", CalcAction.Insert("log2("), KeyStyle.FUNCTION),
+        CalcKey("x³", CalcAction.Insert("^3"), KeyStyle.OPERATOR),
+        CalcKey("pow", CalcAction.Insert("pow("), KeyStyle.FUNCTION)
     )
 )
 
@@ -582,6 +589,7 @@ private fun displayExpression(raw: String): String {
         .replace("sqrt(", "\u221A(")
         .replace("cbrt(", "\u221B(")
         .replace("nrt(", "\u207F\u221A(")
+        .replace("log2(", "\u2082(")
         .replace("abs(", "|")
         .replace("inv(", "1/")
 }

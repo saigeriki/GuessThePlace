@@ -21,11 +21,11 @@ It replaces the earlier `GuessThePlace` quiz project in this repository. Everyth
 - Trigonometric: `sin`, `cos`, `tan`, `asin`, `acos`, `atan`
 - Hyperbolic: `sinh`, `cosh`, `tanh`
 - Logarithms: `ln`, `log` (base 10), `log₂`
-- Powers and roots: `x²`, `xʸ`, `√`, `∛`, `ⁿ√`
+- Powers and roots: `x²`, `x³`, `xʸ`, `eˣ`, `√`, `∛`, `ⁿ√`
 - Factorial `x!` (supports non-integers via Gamma function)
 - Reciprocal `1/x`
 - Absolute value `|x|`
-- Modulo `mod(a,b)`
+- Modulo `mod(a,b)` and generic `pow(a,b)` (use the `,` key to separate arguments)
 - Constants `π` and `e`
 - Angle modes: **DEG / RAD / GRAD**
 - Implicit multiplication: `2(3+4)`, `2π`, `2sin(30)`
