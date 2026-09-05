@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "GuessThePlaceIndia"
+rootProject.name = "ScientificCalculator"
 include(":app")

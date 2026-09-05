@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.guesstheplaceindia"
+    namespace = "com.example.scientificcalculator"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.guesstheplaceindia"
+        applicationId = "com.example.scientificcalculator"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
